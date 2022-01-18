@@ -96,7 +96,7 @@
             L.polygon(iso, {color: color, fillColor: color, opacity: 0.2, fillOpacity: 0.3}).addTo(mymap);
         });
     });
-    <!--L.polygon(sbgBorderPoly, {color: 'blue', fillColor: '#000000', weight: 1, opacity: 0.5}).addTo(mymap);-->
+    L.polygon(sbgBorderPoly, {color: 'blue', fillColor: '#000000', weight: 1, opacity: 0.5}).addTo(mymap);
 
     const legend = L.control({position: 'bottomleft'});
     legend.onAdd = function () {
@@ -111,6 +111,23 @@
     };
     legend.addTo(mymap);
 
+    const info = L.control();
+    info.onAdd = function () {
+        const div = L.DomUtil.create("div", "legend");
+        L.DomUtil.addClass(div, "info");
+        div.innerHTML += "<h4>Best-Case-Eintreffzeit des ersten Rettungsmittels am Notfallort</h4>";
+        div.innerHTML += "<ul>";
+        div.innerHTML += "<li>Es wird nur die reine Fahrtzeit berücksichtigt, keine Ausrückzeit</li>";
+        div.innerHTML += "<li>Die Zeitersparnis durch die Verwendung von Sondersignalen wird vernachlässigt</li>";
+        div.innerHTML += "<li>&quot;Best-Case&quot; bedeutet, dass das nächstgelegene Rettungsmittel verfügbar ist (d.h. nicht außer Betrieb, nicht gebunden, ...)</li>";
+        div.innerHTML += "</ul>";
+        div.innerHTML += "<br />"
+        div.innerHTML += "Danke an <a href='https://github.com/chrboe'/a>chrboe</a> für die <a href='https://github.com/chrboe/rd-geo/'>Vorlage</a> in NÖ und dem <a href='https://www.reddit.com/r/Austria/comments/s68wpe/rettungsdienstabdeckung_in_niederösterreich'/>Reddit Post</a>.";
+        div.innerHTML += "<br />";
+        div.innerHTML += "<a href='https://github.com/flo-sbg/rd-geo' style='text-decoration: none'><img src='GitHub-Mark-32px.png' style='height: 14px; display: inline-block; vertical-align: text-top;'/> Source auf GitHub</a>";
+        return div;
+    };
+    info.addTo(mymap);
 </script>
 </body>
 </html>
