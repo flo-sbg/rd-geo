@@ -2,8 +2,7 @@
 <html lang="de-AT">
 <head>
     <meta charset="utf-8"/>
-    <meta property="og:image" content="https://chrboe.github.io/rd-geo/preview.png" />
-    <title>Rettungsdienstabdeckung Niederösterreich</title>
+    <title>Rettungsdienstabdeckung SBG</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin=""/>
@@ -70,22 +69,14 @@
 <body>
 <div id="map"></div>
 <script>
-    var minPoint = [47.45573, 14.52666];
-    var maxPoint = [48.94772, 16.96048];
+    var minPoint = [46.9, 12.0];
+    var maxPoint = [48.1, 14.0];
 
     var icons = {
         "RK": L.icon({
             iconUrl: 'markers/rk-marker.png',
             iconSize: [18, 28],
             iconAnchor: [9, 28],
-        }),
-        "ASB": L.icon({
-            iconUrl: 'markers/asb-marker.png',
-            iconSize: [18, 28],
-        }),
-        "JUH": L.icon({
-            iconUrl: 'markers/juh-marker.png',
-            iconSize: [18, 28],
         }),
     };
 
@@ -96,7 +87,7 @@
     }).addTo(mymap);
 
     departments.forEach((dep) => {
-        L.marker(dep.coords, {icon: icons[dep.organization]}).bindTooltip(dep.name).addTo(mymap);
+        L.marker(dep.coords, {icon: icons["RK"]}).bindTooltip(dep.name).addTo(mymap);
     });
 
     ['purple', 'red', 'orange', 'green'].forEach((color) => {
@@ -105,8 +96,7 @@
             L.polygon(iso, {color: color, fillColor: color, opacity: 0.2, fillOpacity: 0.3}).addTo(mymap);
         });
     });
-    L.polygon(vieBorderPoly, {color: 'blue', fillColor: '#000000', weight: 1, opacity: 0.5}).addTo(mymap);
-    L.polygon(noeBorderPoly, {color: 'blue', fillColor: '#000000', weight: 1, opacity: 0.5}).addTo(mymap);
+    <!--L.polygon(sbgBorderPoly, {color: 'blue', fillColor: '#000000', weight: 1, opacity: 0.5}).addTo(mymap);-->
 
     const legend = L.control({position: 'bottomleft'});
     legend.onAdd = function () {
@@ -120,21 +110,6 @@
     };
     legend.addTo(mymap);
 
-    const info = L.control();
-    info.onAdd = function () {
-        const div = L.DomUtil.create("div", "legend");
-        L.DomUtil.addClass(div, "info");
-        div.innerHTML += "<h4>Best-Case-Eintreffzeit des ersten Rettungsmittels am Notfallort</h4>";
-        div.innerHTML += "<ul>";
-        div.innerHTML += "<li>Es wird nur die reine Fahrtzeit berücksichtigt, keine Ausrückzeit</li>";
-        div.innerHTML += "<li>Die Zeitersparnis durch die Verwendung von Sondersignalen wird vernachlässigt</li>";
-        div.innerHTML += "<li>&quot;Best-Case&quot; bedeutet, dass das nächstgelegene Rettungsmittel verfügbar ist (d.h. nicht außer Betrieb, nicht gebunden, ...)</li>";
-        div.innerHTML += "</ul>";
-        div.innerHTML += "<br />"
-        div.innerHTML += "<a href='https://github.com/chrboe/rd-geo' style='text-decoration: none'><img src='GitHub-Mark-32px.png' style='height: 14px; display: inline-block; vertical-align: text-top;'/> Source auf GitHub</a>"
-        return div;
-    };
-    info.addTo(mymap);
 </script>
 </body>
 </html>

@@ -24,9 +24,8 @@ def convert_border(filename, invert=False):
     return Polygon(coords)
 
 
-vie = convert_border('kml/vie-border.kml')
-noe = convert_border('kml/noe-border.kml')
-noe_inv = convert_border('kml/noe-border.kml', invert=True)
+sbg = convert_border('kml/sbg-border.kml')
+sbg_inv = convert_border('kml/sbg-border.kml', invert=True)
 
 
 def poly_from_coords(coords):
@@ -34,7 +33,6 @@ def poly_from_coords(coords):
     for coord in coords:
         poly_coords.append((coord[1], coord[0]))
     poly = Polygon(poly_coords)
-    poly = poly.difference(vie)
     return poly
 
 
@@ -48,7 +46,7 @@ def request_coords(locations):
     body = {"locations": locations, "range": [10 * 60, 15 * 60, 20 * 60], "range_type": "time", "options": options}
     headers = {
         'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
-        'Authorization': os.getenv('ORS_AUTH'),
+        'Authorization': 'API_KEY',
         'Content-Type': 'application/json; charset=utf-8'
     }
 
@@ -100,7 +98,7 @@ def get_poly_coords(poly_map):
 cached = True
 
 if not cached:
-    filename = "standorte.kml"
+    filename = "kml/sbg-standorte.kml"
 
     locations = []
     with open(filename) as f:
@@ -149,17 +147,13 @@ else:
     unions["orange"] = unions["orange"].difference(unions["green"])
 
     # avoid the polygons "leaking" out of the map bounds (out of Lower Austria/into Vienna)
-    unions["red"] = unions["red"].difference(vie)
-    unions["orange"] = unions["orange"].difference(vie)
-    unions["green"] = unions["green"].difference(vie)
-    unions["red"] = unions["red"].difference(noe_inv)
-    unions["orange"] = unions["orange"].difference(noe_inv)
-    unions["green"] = unions["green"].difference(noe_inv)
+    unions["red"] = unions["red"].difference(sbg_inv)
+    unions["orange"] = unions["orange"].difference(sbg_inv)
+    unions["green"] = unions["green"].difference(sbg_inv)
 
     # there is actually a fourth color, purple, which denotes all the places that cannot even be reached in 20 minutes
     # (or cannot be reached at all). this is just "the rest", so start with Lower Austria and subtract all polys
-    unions["purple"] = noe.difference(vie).difference(unions["red"]).difference(unions["orange"]).difference(
-        unions["green"])
+    unions["purple"] = sbg.difference(unions["red"]).difference(unions["orange"]).difference(unions["green"])
 
     isos = get_poly_coords(unions)
 
