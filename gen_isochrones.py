@@ -43,7 +43,7 @@ def request_coords(locations):
     global i
 
     options = {}
-    body = {"locations": locations, "range": [10 * 60, 15 * 60, 20 * 60], "range_type": "time", "options": options}
+    body = {"locations": locations, "range": [10 * 60, 15 * 60, 20 * 60, 25 * 60], "range_type": "time", "options": options}
     headers = {
         'Accept': 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8',
         'Authorization': 'API_KEY',
@@ -121,7 +121,7 @@ if not cached:
 
     sys.exit(0)
 else:
-    polys = [[], [], []]
+    polys = [[], [], [], []]
     for filename in glob.glob('raw-isochrone-responses/response-*.json'):
         with open(filename, 'r') as f:
             data = json.loads(f.read())
@@ -137,23 +137,27 @@ else:
     # merge individual polys together
     unions = {
         "green": unary_union(polys[0]),
-        "orange": unary_union(polys[1]),
-        "red": unary_union(polys[2])
+        "yellow": unary_union(polys[1]),
+        "orange": unary_union(polys[2]),
+        "red": unary_union(polys[3])
     }
 
     # avoid overlapping colors by cutting out the polys of "upper" colors from the "lower" ones.
     # red is all the way at the bottom, then orange, then green
     unions["red"] = unions["red"].difference(unions["orange"])
-    unions["orange"] = unions["orange"].difference(unions["green"])
+    unions["orange"] = unions["orange"].difference(unions["yellow"])
+    unions["yellow"] = unions["yellow"].difference(unions["green"])
 
-    # avoid the polygons "leaking" out of the map bounds (out of Lower Austria/into Vienna)
+
+# avoid the polygons "leaking" out of the map bounds (out of Lower Austria/into Vienna)
     unions["red"] = unions["red"].difference(sbg_inv)
     unions["orange"] = unions["orange"].difference(sbg_inv)
+    unions["yellow"] = unions["yellow"].difference(sbg_inv)
     unions["green"] = unions["green"].difference(sbg_inv)
 
     # there is actually a fourth color, purple, which denotes all the places that cannot even be reached in 20 minutes
     # (or cannot be reached at all). this is just "the rest", so start with Lower Austria and subtract all polys
-    unions["purple"] = sbg.difference(unions["red"]).difference(unions["orange"]).difference(unions["green"])
+    unions["purple"] = sbg.difference(unions["red"]).difference(unions["orange"]).difference(unions["yellow"]).difference(unions["green"])
 
     isos = get_poly_coords(unions)
 
